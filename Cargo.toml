@@ -3,4 +3,21 @@ name = "contract_service"
 version = "0.1.0"
 edition = "2021"
 
+[[bin]]
+name = "contract_service"
+path = "src/main.rs"
+
 [dependencies]
+chrono = { version = "0.4", features = ["serde"] }
+dotenv = "0.15.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0.118"
+sqlx = { version = "0.7", features = [
+  "runtime-tokio",
+  "macros",
+  "postgres",
+  "uuid",
+  "chrono",
+] }
+tokio = { version = "1.38.0", features = ["full"] }
+uuid = { version = "1.8.0", features = ["serde", "v4"] }
