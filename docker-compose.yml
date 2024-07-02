@@ -1,0 +1,18 @@
+services:
+  postgres:
+    container_name: postgres
+    restart: always
+    image: 'postgres:16-alpine'
+    ports:
+      - '5432:5432'
+    environment:
+      TZ: 'America/Sao_Paulo'
+      POSTGRES_PASSWORD: 'password'
+      POSTGRES_USER: 'username'
+      POSTGRES_DB: 'contract_db'
+    volumes:
+      - 'contract_db:/var/lib/postgresql/data:rw'
+
+volumes:
+  contract_db:
+    driver: local
