@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package customer;
+
+import "google/protobuf/timestamp.proto";
+
+message Customer {
+    string transaction_id = 1;
+    int32 id = 2;
+    string public_id = 3;
+    string document = 4;
+    string name = 5;
+    google.protobuf.Timestamp disabled_at = 6; // nullable
+    google.protobuf.Timestamp created_at = 7;
+    google.protobuf.Timestamp updated_at = 8;
+}
+
+message CreateCustomerRequest {
+    string document = 1;
+    string name = 2;
+}
+
+message CreateCustomerResponse {
+    Customer customer = 1;
+}
+
+service CustomerService {
+    rpc CreateCustomer(CreateCustomerRequest) returns (CreateCustomerResponse);
+}
