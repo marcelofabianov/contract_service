@@ -5,7 +5,7 @@ use uuid::Uuid;
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Customer {
     pub transaction_id: Uuid,
-    pub id: u32,
+    pub id: i32,
     pub public_id: Uuid,
     pub document: String,
     pub name: String,
@@ -18,7 +18,7 @@ pub struct Customer {
 impl Customer {
     pub fn new(
         transaction_id: Uuid,
-        id: u32,
+        id: i32,
         public_id: Uuid,
         document: String,
         name: String,
