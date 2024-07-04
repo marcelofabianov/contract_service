@@ -14,6 +14,7 @@ A seguir temos tópicos que descrevem o projeto e seus requisitos, politicas de 
 - [Requisitos](_docs/requisitos.md)
 - [Requisitos não funcionais](_docs/requisitos-nao-funcionais.md)
 - [Versionamento](_docs/versionamento.md)
+- [ChangeLog](_docs/changelog.md)
 - [Arquitetura](_docs/arquitetura.md)
 - [gRPC](_docs/grpc.md)
 - [Eventos](_docs/eventos.md)
