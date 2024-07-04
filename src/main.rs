@@ -1,5 +1,12 @@
+mod bootstrap;
 mod db;
 mod env;
+mod grpc {
+    pub mod controller;
+    pub mod pb {
+        pub mod customer_pb;
+    }
+}
 mod internal {
     pub mod adapters;
     pub mod domain {
@@ -10,37 +17,30 @@ mod internal {
     pub mod application;
 }
 
+use bootstrap::CustomerContainer;
 use db::Postgres;
 use env::Env;
-use internal::adapters::CustomerRepositoryPostgres;
-use internal::application::CustomerService;
-use internal::domain::use_case::{CreateCustomerInput, CreateCustomerUseCase};
+use grpc::controller::CustomerController;
+use grpc::pb::customer_pb::customer_service_server::CustomerServiceServer;
+use tonic::transport::Server;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let env = Env::load();
     let db = Postgres::new(&env.database_url).await?;
-    let pool = db.get_pool().await;
 
-    let repository = CustomerRepositoryPostgres::new(pool);
+    let container = CustomerContainer::new(env, db).await?;
 
-    let use_case = CreateCustomerUseCase::new(repository);
+    let addr: std::net::SocketAddr = "[::1]:50051".parse().unwrap();
 
-    let input = CreateCustomerInput {
-        document: "12345678901".to_string(),
-        name: "Rust Foundation".to_string(),
-    };
+    let customer_service = CustomerController { container };
 
-    let service = CustomerService::new(
-        use_case,
-        env.producer_id,
-        env.producer_name,
-        env.environment,
-    );
+    println!("Server listening on {}", addr);
 
-    let customer = service.create_customer(input).await?;
-
-    println!("{:?}", customer);
+    Server::builder()
+        .add_service(CustomerServiceServer::new(customer_service))
+        .serve(addr)
+        .await?;
 
     Ok(())
 }
