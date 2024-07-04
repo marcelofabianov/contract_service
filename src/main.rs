@@ -31,7 +31,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let container = CustomerContainer::new(env, db).await?;
 
-    let addr = "[::1]:50051".parse().unwrap();
+    let addr: std::net::SocketAddr = "[::1]:50051".parse().unwrap();
+
     let customer_service = CustomerController { container };
 
     println!("Server listening on {}", addr);
