@@ -1,3 +1,4 @@
+mod bootstrap;
 mod db;
 mod env;
 mod internal {
@@ -10,33 +11,23 @@ mod internal {
     pub mod application;
 }
 
+use bootstrap::CustomerContainer;
 use db::Postgres;
 use env::Env;
-use internal::adapters::CustomerRepositoryPostgres;
-use internal::application::CustomerService;
-use internal::domain::use_case::{CreateCustomerInput, CreateCustomerUseCase};
+use internal::domain::use_case::CreateCustomerInput;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let env = Env::load();
     let db = Postgres::new(&env.database_url).await?;
-    let pool = db.get_pool().await;
 
-    let repository = CustomerRepositoryPostgres::new(pool);
-
-    let use_case = CreateCustomerUseCase::new(repository);
+    let container = CustomerContainer::new(env, db).await?;
+    let service = container.create_customer_service().await;
 
     let input = CreateCustomerInput {
         document: "12345678901".to_string(),
         name: "Rust Foundation".to_string(),
     };
-
-    let service = CustomerService::new(
-        use_case,
-        env.producer_id,
-        env.producer_name,
-        env.environment,
-    );
 
     let customer = service.create_customer(input).await?;
 
