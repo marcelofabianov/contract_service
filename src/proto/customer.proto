@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package customer_grpc_service;
+package customer_pb;
 
 import "google/protobuf/timestamp.proto";
 

@@ -3,8 +3,8 @@ mod db;
 mod env;
 mod grpc {
     pub mod controller;
-    pub mod service {
-        tonic::include_proto!("customer_grpc_service");
+    pub mod pb {
+        pub mod customer_pb;
     }
 }
 mod internal {
@@ -21,7 +21,7 @@ use bootstrap::CustomerContainer;
 use db::Postgres;
 use env::Env;
 use grpc::controller::CustomerController;
-use grpc::service::customer_service_server::CustomerServiceServer;
+use grpc::pb::customer_pb::customer_service_server::CustomerServiceServer;
 use tonic::transport::Server;
 
 #[tokio::main]

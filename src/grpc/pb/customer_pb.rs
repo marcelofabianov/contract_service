@@ -137,15 +137,12 @@ pub mod customer_service_client {
                 })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
-                "/customer_grpc_service.CustomerService/CreateCustomer",
+                "/customer_pb.CustomerService/CreateCustomer",
             );
             let mut req = request.into_request();
             req.extensions_mut()
                 .insert(
-                    GrpcMethod::new(
-                        "customer_grpc_service.CustomerService",
-                        "CreateCustomer",
-                    ),
+                    GrpcMethod::new("customer_pb.CustomerService", "CreateCustomer"),
                 );
             self.inner.unary(req, path, codec).await
         }
@@ -245,7 +242,7 @@ pub mod customer_service_server {
         fn call(&mut self, req: http::Request<B>) -> Self::Future {
             let inner = self.inner.clone();
             match req.uri().path() {
-                "/customer_grpc_service.CustomerService/CreateCustomer" => {
+                "/customer_pb.CustomerService/CreateCustomer" => {
                     #[allow(non_camel_case_types)]
                     struct CreateCustomerSvc<T: CustomerService>(pub Arc<T>);
                     impl<
@@ -330,6 +327,6 @@ pub mod customer_service_server {
         }
     }
     impl<T: CustomerService> tonic::server::NamedService for CustomerServiceServer<T> {
-        const NAME: &'static str = "customer_grpc_service.CustomerService";
+        const NAME: &'static str = "customer_pb.CustomerService";
     }
 }

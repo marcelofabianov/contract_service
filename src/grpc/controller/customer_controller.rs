@@ -4,12 +4,11 @@ use tonic::{Request, Response, Status};
 use uuid::Uuid;
 
 use crate::bootstrap::CustomerContainer;
-use crate::grpc::service::customer_grpc_service::{
+use crate::grpc::pb::customer_pb::{
     customer_service_server::CustomerService as CustomerServiceGrpcTrait, CreateCustomerRequest,
     CreateCustomerResponse, Customer,
 };
 
-#[derive(Debug, Default)]
 pub struct CustomerController {
     pub container: CustomerContainer,
 }
@@ -22,21 +21,30 @@ impl CustomerServiceGrpcTrait for CustomerController {
     ) -> Result<Response<CreateCustomerResponse>, Status> {
         let req = request.into_inner();
 
-        //... operacao de create pelo customer_service
+        // Simulando operação de criação pelo serviço de cliente
+        // Suponha que você tenha lógica aqui para criar um cliente
 
-        //... customer sera obtido de um use case
+        // Simulando obtenção do cliente de um caso de uso
         let customer = Customer {
             transaction_id: Uuid::new_v4().to_string(),
             id: 0,
             public_id: Uuid::new_v4().to_string(),
             document: req.document,
             name: req.name,
-            disabled_at: None,
-            created_at: Some(Timestamp::from(Utc::now())),
-            updated_at: Some(Timestamp::from(Utc::now())),
+            disabled_at: None, // Aqui você precisa usar `None` porque é opcional
+            created_at: Some(Timestamp {
+                seconds: Utc::now().timestamp(),
+                nanos: 0,
+            }),
+            updated_at: Some(Timestamp {
+                seconds: Utc::now().timestamp(),
+                nanos: 0,
+            }),
         };
 
-        let reply = CreateCustomerResponse { customer };
+        let reply = CreateCustomerResponse {
+            customer: Some(customer),
+        };
 
         Ok(Response::new(reply))
     }
