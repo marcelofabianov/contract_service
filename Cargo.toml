@@ -2,6 +2,8 @@
 name = "contract_service"
 version = "0.1.0"
 edition = "2021"
+publish = false
+build = "build.rs"
 
 [[bin]]
 name = "contract_service"
@@ -21,3 +23,9 @@ sqlx = { version = "0.7", features = [
 ] }
 tokio = { version = "1.38.0", features = ["full"] }
 uuid = { version = "1.8.0", features = ["serde", "v4"] }
+tonic = "0.11"
+prost = "0.12"
+tonic-reflection = "0.11"
+
+[build-dependencies]
+tonic-build = "0.11"
