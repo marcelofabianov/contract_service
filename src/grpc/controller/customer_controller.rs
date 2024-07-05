@@ -1,13 +1,13 @@
-use chrono::Utc;
-use prost_types::Timestamp;
 use tonic::{Request, Response, Status};
-use uuid::Uuid;
 
 use crate::bootstrap::CustomerContainer;
 use crate::grpc::pb::customer_pb::{
     customer_service_server::CustomerService as CustomerServiceGrpcTrait, CreateCustomerRequest,
-    CreateCustomerResponse, Customer,
+    CreateCustomerResponse,
 };
+
+use crate::grpc::mapper::customer_mapper;
+use crate::internal::domain::use_case::CreateCustomerInput;
 
 pub struct CustomerController {
     pub container: CustomerContainer,
@@ -21,31 +21,27 @@ impl CustomerServiceGrpcTrait for CustomerController {
     ) -> Result<Response<CreateCustomerResponse>, Status> {
         let req = request.into_inner();
 
-        // Simulando operação de criação pelo serviço de cliente
-        // Suponha que você tenha lógica aqui para criar um cliente
+        let service = self.container.create_customer_service().await;
 
-        // Simulando obtenção do cliente de um caso de uso
-        let customer = Customer {
-            transaction_id: Uuid::new_v4().to_string(),
-            id: 0,
-            public_id: Uuid::new_v4().to_string(),
-            document: req.document,
-            name: req.name,
-            disabled_at: None, // Aqui você precisa usar `None` porque é opcional
-            created_at: Some(Timestamp {
-                seconds: Utc::now().timestamp(),
-                nanos: 0,
-            }),
-            updated_at: Some(Timestamp {
-                seconds: Utc::now().timestamp(),
-                nanos: 0,
-            }),
+        let input = CreateCustomerInput {
+            document: req.document.clone(),
+            name: req.name.clone(),
         };
 
-        let reply = CreateCustomerResponse {
-            customer: Some(customer),
-        };
+        let output = service.create_customer(input).await;
 
-        Ok(Response::new(reply))
+        match output {
+            Ok(customer) => {
+                let customer_grpc = customer_mapper::map_to_customer_grpc(customer);
+                let reply = CreateCustomerResponse {
+                    customer: Some(customer_grpc),
+                };
+                Ok(Response::new(reply))
+            }
+            Err(err) => {
+                println!("Failed to create customer: {:?}", err);
+                Err(Status::unknown("Failed to create customer"))
+            }
+        }
     }
 }
