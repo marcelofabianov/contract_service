@@ -1,0 +1,3 @@
+# Microservice: Contract Service
+
+## ChangeLog
