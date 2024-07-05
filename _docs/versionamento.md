@@ -72,3 +72,68 @@ git commit -m "feat: Adiciona nova funcionalidade"
 
 - As tags devem ser criadas a partir da branch main.
 - As tags devem seguir o padrão `vX.Y.Z`, onde `X` é a versão principal, `Y` é a versão secundária e `Z` é a versão de correção.
+
+### Pull Requests
+
+Template de pull request:
+
+```markdown
+## Descrição
+
+Descrição detalhada do que foi feito.
+
+## Issue
+
+Número da issue relacionada ao pull request.
+
+## Checklist
+
+**Objetivo**
+
+- [ ] Adicionei nova funcionalidade
+- [ ] Corrigi um bug
+- [ ] Corrigi um bug urgente hotfix
+- [ ] Documentei algo novo ou existente não documentado
+- [ ] Refatorei código visando melhoria na qualidade
+- [ ] Refatorei código visando melhoria na performance
+
+**Importante**
+
+- [ ] Modifiquei a estrutura de banco de dados
+- [ ] Modifiquei variáveis de ambiente
+- [ ] Modifiquei arquivos do gRPC / proto
+- [ ] Modifiquei arquivos .gitignore
+- [ ] Modifiquei arquivos de configuração
+- [ ] Modifiquei arquivos de dependências
+- [ ] Modifiquei arquivos de build
+- [ ] Modifiquei urls de endpoints e estruturas de dados
+
+**Testes**
+
+- [ ] Testei localmente
+- [ ] Adicionei testes unitários
+- [ ] Adicionei testes de integração
+
+**Documentação**
+
+- [ ] Atualizei a documentação
+- [ ] Atualizei o CHANGELOG
+- [ ] Atualizei o Postman Collection
+
+**Revisão de código**
+
+- [ ] O código deve ser revisado por DBA?
+- [ ] O código deve ser revisado por um especialista?
+- [ ] O código deve ser revisado por um arquiteto?
+- [ ] O código deve ser revisado por um líder técnico?
+
+```
+
+### Code Review
+
+- O code review deve ser feito por 2 ou mais membros do time.
+- O code review deve ser feito de forma construtiva e respeitosa.
+- O code review deve ser feito com foco em aprendizado e melhoria contínua.
+- O code review deve ser feito observando dados sensíveis e vulnerabilidades de segurança.
+- O code review deve ser feito observando a qualidade do código e a cobertura de testes.
+- O code review deve ser feito observando a documentação e o changelog.
