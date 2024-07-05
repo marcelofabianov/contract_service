@@ -1,6 +1,28 @@
 services:
-  postgres:
-    container_name: postgres
+  contract_grpc:
+    container_name: contract_grpc
+    restart: always
+    image: biz/contract_grpc:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+    ports:
+      - '50051:50051'
+    environment:
+      TZ: 'America/Sao_Paulo'
+      RUST_LOG: debug
+      DATABASE_URL: postgresql://username:password@contract_db:5432/contract_db
+    command: cargo watch -x run
+    depends_on:
+      - contract_db
+      - kafka
+    networks:
+      - biz_network
+
+  contract_db:
+    container_name: contract_db
     restart: always
     image: 'postgres:16-alpine'
     ports:
@@ -12,6 +34,58 @@ services:
       POSTGRES_DB: 'contract_db'
     volumes:
       - 'contract_db:/var/lib/postgresql/data:rw'
+    networks:
+      - biz_network
+
+  zookeeper:
+    container_name: zookeeper
+    restart: always
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    networks:
+      - biz_network
+
+  kafka:
+    container_name: kafka
+    restart: always
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "9094:9094"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_LISTENERS: INTERNAL://kafka:9092,OUTSIDE://0.0.0.0:9094
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,OUTSIDE://localhost:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,OUTSIDE:PLAINTEXT
+    networks:
+      - biz_network
+
+  control-center:
+    container_name: control-center
+    restart: always
+    image: confluentinc/cp-enterprise-control-center:latest
+    hostname: control-center
+    depends_on:
+      - kafka
+    ports:
+      - "9021:9021"
+    environment:
+      CONTROL_CENTER_BOOTSTRAP_SERVERS: 'kafka:9092'
+      CONTROL_CENTER_REPLICATION_FACTOR: 1
+      CONTROL_CENTER_CONNECT_CLUSTER: http://kafka-connect:8083
+      PORT: 9021
+    networks:
+      - biz_network
+
+networks:
+  biz_network:
+    driver: bridge
 
 volumes:
   contract_db:
