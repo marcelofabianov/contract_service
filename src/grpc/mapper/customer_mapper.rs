@@ -1,4 +1,4 @@
-use crate::grpc::pb::customer_pb::CustomerGrpc;
+use crate::grpc::pb::customer_pb::Customer as CustomerGrpc;
 use crate::internal::domain::model::Customer;
 use prost_types::Timestamp;
 
