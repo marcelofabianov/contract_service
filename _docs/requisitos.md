@@ -24,7 +24,7 @@ decisões de design e arquitetura serão tomadas, além de integrar com outros s
 **Fase 3**
 - [x] Criar docker-compose para rodar o kafka
 - [x] Criar producer para publicar eventos no kafka
-- [ ] Publicar evento `customer.created` pelo producer
+- [x] Publicar evento `customer.created` pelo producer
 
 **Fase 4**
 - [ ] Criar testes unitários
