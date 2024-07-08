@@ -1,3 +1,5 @@
+use crate::errors::PostgresError;
+
 use sqlx::{postgres::PgPoolOptions, PgPool};
 
 pub struct Postgres {
@@ -5,11 +7,12 @@ pub struct Postgres {
 }
 
 impl Postgres {
-    pub async fn new(database_url: &str) -> Result<Self, sqlx::Error> {
+    pub async fn new(database_url: &str) -> Result<Self, PostgresError> {
         let pool = PgPoolOptions::new()
             .max_connections(5)
             .connect(database_url)
-            .await?;
+            .await
+            .map_err(|err| PostgresError::ConnectionError(err.to_string()))?;
 
         Ok(Self { pool })
     }
