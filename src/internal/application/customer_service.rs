@@ -55,9 +55,9 @@ impl CustomerService {
             self.environment.clone(),
         );
 
-        let data_json = customer_created.to_json()?;
-        // publicar evento no kafka
-        println!("{}", data_json);
+        self.producer
+            .publisher(customer_created.to_json()?, customer_created.topic)
+            .await?;
 
         Ok(customer.clone())
     }
