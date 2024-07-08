@@ -11,7 +11,7 @@ impl Postgres {
             .max_connections(5)
             .connect(database_url)
             .await
-            .map_err(|err| PostgresError::ConnectionError(err.to_string()))?;
+            .map_err(|err| PostgresError::new(&err.to_string()))?;
 
         Ok(Self { pool })
     }
