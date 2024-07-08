@@ -17,7 +17,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let container = bootstrap::CustomerContainer::new(env, db).await?;
 
-    let addr: std::net::SocketAddr = "[::1]:50051".parse().unwrap();
+    let addr: std::net::SocketAddr = "0.0.0.0:50051".parse().unwrap();
 
     let customer_service = CustomerController { container };
 

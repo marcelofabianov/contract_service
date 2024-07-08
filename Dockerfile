@@ -2,8 +2,6 @@ FROM rust:1.78
 
 WORKDIR /app
 
-ENV DATABASE_URL: postgresql://username:password@contract_db:5432/contract_db
-
 RUN apt-get update -yqq && \
   apt-get upgrade -y && \
   apt-get install -y --no-install-recommends \
@@ -22,10 +20,6 @@ RUN apt-get update -yqq && \
 RUN cargo install sqlx-cli && cargo install cargo-watch
 
 COPY . .
-
-RUN cargo sqlx migrate run
-
-RUN cargo build
 
 EXPOSE 50051
 
