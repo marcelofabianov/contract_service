@@ -82,11 +82,17 @@ Template de pull request:
 
 Descrição detalhada do que foi feito.
 
-## Issue
+## Issue/RF
 
-Número da issue relacionada ao pull request.
+Número da issue ou/e RF relacionada ao pull request.
 
 ## Checklist
+
+**Revisão de código**
+
+- [ ] O código deve ser revisado por DBA?
+- [ ] O código deve ser revisado por um especialista?
+- [ ] O código deve ser revisado por um arquiteto?
 
 **Objetivo**
 
@@ -107,6 +113,7 @@ Número da issue relacionada ao pull request.
 - [ ] Modifiquei arquivos de dependências
 - [ ] Modifiquei arquivos de build
 - [ ] Modifiquei urls de endpoints e estruturas de dados
+- [ ] Modifiquei arquivos Dockerfile ou docker-compose.yml
 
 **Testes**
 
@@ -120,12 +127,7 @@ Número da issue relacionada ao pull request.
 - [ ] Atualizei o CHANGELOG
 - [ ] Atualizei o Postman Collection
 
-**Revisão de código**
-
-- [ ] O código deve ser revisado por DBA?
-- [ ] O código deve ser revisado por um especialista?
-- [ ] O código deve ser revisado por um arquiteto?
-- [ ] O código deve ser revisado por um líder técnico?
+**Coloque mais detalhes se necessário apartir daqui**
 
 ```
 
