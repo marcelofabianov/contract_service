@@ -120,12 +120,15 @@ Número da issue ou/e RF relacionada ao pull request.
 - [ ] Testei localmente
 - [ ] Adicionei testes unitários
 - [ ] Adicionei testes de integração
+- [ ] Adicionei testes AB
 
 **Documentação**
 
-- [ ] Atualizei a documentação
+- [ ] Atualizei a documentação e _docs
+- [ ] Atualizei o Postman Collection e _req
 - [ ] Atualizei o CHANGELOG
-- [ ] Atualizei o Postman Collection
+
+---
 
 **Coloque mais detalhes se necessário apartir daqui**
 
