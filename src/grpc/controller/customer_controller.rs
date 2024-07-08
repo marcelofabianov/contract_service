@@ -1,16 +1,16 @@
+use crate::{
+    grpc::mapper::customer_mapper,
+    grpc::pb::customer_pb::{
+        customer_service_server::CustomerService as CustomerServiceGrpcTrait,
+        CreateCustomerRequest, CreateCustomerResponse,
+    },
+    internal::application::CustomerService,
+    internal::domain::use_case::CreateCustomerInput,
+};
 use tonic::{Request, Response, Status};
 
-use crate::bootstrap::CustomerContainer;
-use crate::grpc::pb::customer_pb::{
-    customer_service_server::CustomerService as CustomerServiceGrpcTrait, CreateCustomerRequest,
-    CreateCustomerResponse,
-};
-
-use crate::grpc::mapper::customer_mapper;
-use crate::internal::domain::use_case::CreateCustomerInput;
-
 pub struct CustomerController {
-    pub container: CustomerContainer,
+    pub service: CustomerService,
 }
 
 #[tonic::async_trait]
@@ -21,14 +21,12 @@ impl CustomerServiceGrpcTrait for CustomerController {
     ) -> Result<Response<CreateCustomerResponse>, Status> {
         let req = request.into_inner();
 
-        let service = self.container.create_customer_service().await;
-
         let input = CreateCustomerInput {
             document: req.document.clone(),
             name: req.name.clone(),
         };
 
-        let output = service.create_customer(input).await;
+        let output = self.service.create_customer(input).await;
 
         match output {
             Ok(customer) => {

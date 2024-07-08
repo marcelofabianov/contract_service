@@ -1,28 +1,32 @@
 use crate::internal::domain::event::{CustomerCreatedEvent, CustomerCreatedEventPayload};
 use crate::internal::domain::model::Customer;
 use crate::internal::domain::use_case::{CreateCustomerInput, CreateCustomerUseCase};
+use crate::kafka::Producer;
 use std::error::Error;
 use uuid::Uuid;
 
 pub struct CustomerService {
-    pub create_customer_use_case: CreateCustomerUseCase,
     pub producer_id: Uuid,
     pub producer_name: String,
     pub environment: String,
+    pub producer: Producer,
+    pub create_customer_use_case: CreateCustomerUseCase,
 }
 
 impl CustomerService {
     pub fn new(
-        create_customer_use_case: CreateCustomerUseCase,
         producer_id: Uuid,
         producer_name: String,
         environment: String,
+        producer: Producer,
+        create_customer_use_case: CreateCustomerUseCase,
     ) -> Self {
         Self {
-            create_customer_use_case,
             producer_id,
             producer_name,
             environment,
+            producer,
+            create_customer_use_case,
         }
     }
 
