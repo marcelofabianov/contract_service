@@ -5,7 +5,7 @@ PORT="50051"
 SERVICE="customer_pb.CustomerService"
 METHOD="CreateCustomer"
 DOCUMENT="123456789"
-NAME="John Doe"
+NAME="Rust Foundation"
 
 DATA=$(cat <<EOF
 {
