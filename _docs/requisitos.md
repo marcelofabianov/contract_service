@@ -5,7 +5,7 @@
 ### RF01 - Cadastrar Cliente
 
 O primeiro caso de uso seria o start da arquitetura do microservice. Onde várias
-decisões de design e arquitetura serão tomadas.
+decisões de design e arquitetura serão tomadas, além de integrar com outros serviços e ferramentas.
 
 **Fase 1**
 - [x] Criar migrations para a tabela de customers
@@ -22,10 +22,11 @@ decisões de design e arquitetura serão tomadas.
 - [ ] Criar validacao de dados no request do controller
 
 **Fase 3**
-- [ ] Criar docker-compose para rodar o kafka
-- [ ] Criar producer para publicar eventos no kafka
-- [ ] Criar consumer para ouvir eventos no kafka
+- [x] Criar docker-compose para rodar o kafka
+- [x] Criar producer para publicar eventos no kafka
+- [ ] Publicar evento `customer.created` pelo producer
 
 **Fase 4**
 - [ ] Criar testes unitários
 - [ ] Criar testes de integração
+- [ ] Criar testes AB
