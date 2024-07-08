@@ -1,22 +1,20 @@
-use crate::errors::PostgresError;
-use sqlx::{postgres::PgPoolOptions, PgPool};
+use std::error::Error;
+use std::fmt;
 
-pub struct Postgres {
-    pool: PgPool,
+#[derive(Debug)]
+pub enum PostgresError {
+    ConnectionError(String),
+    // ...
 }
 
-impl Postgres {
-    pub async fn new(database_url: &str) -> Result<Self, PostgresError> {
-        let pool = PgPoolOptions::new()
-            .max_connections(5)
-            .connect(database_url)
-            .await
-            .map_err(|err| PostgresError::new(&err.to_string()))?;
-
-        Ok(Self { pool })
-    }
-
-    pub async fn get_pool(&self) -> PgPool {
-        self.pool.clone()
+impl fmt::Display for PostgresError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            PostgresError::ConnectionError(msg) => {
+                write!(f, "PostgreSQL Connection Error: {}", msg)
+            } // ...
+        }
     }
 }
+
+impl Error for PostgresError {}

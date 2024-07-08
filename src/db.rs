@@ -1,4 +1,5 @@
 use crate::errors::PostgresError;
+
 use sqlx::{postgres::PgPoolOptions, PgPool};
 
 pub struct Postgres {

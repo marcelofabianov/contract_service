@@ -43,8 +43,20 @@ impl From<KafkaError> for ServiceError {
     }
 }
 
+impl From<tonic::transport::Error> for ServiceError {
+    fn from(err: tonic::transport::Error) -> Self {
+        ServiceError::Other(format!("Tonic transport error: {}", err))
+    }
+}
+
 impl From<Box<dyn std::error::Error>> for ServiceError {
     fn from(err: Box<dyn std::error::Error>) -> Self {
         ServiceError::Other(format!("Boxed error: {}", err))
+    }
+}
+
+impl From<std::fmt::Error> for ServiceError {
+    fn from(err: std::fmt::Error) -> Self {
+        ServiceError::Other(format!("Format error: {}", err))
     }
 }
