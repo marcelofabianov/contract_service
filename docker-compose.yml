@@ -286,7 +286,5 @@ volumes:
     driver: local
   kibanadata:
     driver: local
-  keycloak-data:
-    driver: local
   keycloak-db-data:
     driver: local
