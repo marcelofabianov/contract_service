@@ -1,5 +1,7 @@
 # Microservice: Contract Service
 
+[Home](../README.md)
+
 ## Políticas de versionamento
 
 Este documento descreve as políticas de versionamento adotadas para o projeto Contract Service.
@@ -93,6 +95,7 @@ Número da issue ou/e RF relacionada ao pull request.
 - [ ] O código deve ser revisado por DBA?
 - [ ] O código deve ser revisado por um especialista?
 - [ ] O código deve ser revisado por um arquiteto?
+- [ ] O documento deve ser revisado por um analista ?
 
 **Objetivo**
 
