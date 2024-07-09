@@ -1,6 +1,8 @@
-# Microservice: Contract Management Service
+# Microservice: Contract Service
 
-O ContractManagementService é um microserviço dedicado à gestão de contratos dentro de um sistema
+[Home](../README.md)
+
+O ContractService é um microserviço dedicado à gestão de contratos dentro de um sistema
 ERP SaaS, permitindo a administração eficiente de contratos de clientes, incluindo detalhes de
 planos, funcionalidades contratadas, termos de uso assinados, e conformidade com regulamentações
 como o LGPD. Este serviço integra funcionalidades para a criação, atualização e monitoramento
