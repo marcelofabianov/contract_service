@@ -5,6 +5,7 @@ WORKDIR /app
 RUN apt-get update -yqq && \
   apt-get upgrade -y && \
   apt-get install -y --no-install-recommends \
+  zsh \
   git \
   wget \
   curl \
@@ -21,6 +22,9 @@ RUN cargo install sqlx-cli && cargo install cargo-watch
 
 COPY . .
 
+# gRPC
 EXPOSE 50051
+# tracer
+EXPOSE 4317
 
-CMD ["cargo", "watch", "-x", "run"]
+CMD ["tail", "-f", "/dev/null"]

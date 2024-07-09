@@ -1,29 +1,8 @@
 services:
-  contract_grpc:
-    container_name: contract_grpc
+  contract-db:
+    container_name: contract-db
     restart: always
-    image: biz/contract_grpc:latest
-    build:
-      context: .
-      dockerfile: Dockerfile
-    volumes:
-      - .:/app
-    ports:
-      - '50051:50051'
-    environment:
-      TZ: 'America/Sao_Paulo'
-      RUST_LOG: debug
-      ENV DATABASE_URL: postgresql://username:password@contract_db:5432/contract_db
-    depends_on:
-      - contract_db
-      - kafka
-    networks:
-      - biz_network
-
-  contract_db:
-    container_name: contract_db
-    restart: always
-    image: 'postgres:16-alpine'
+    image: 'postgres:15-alpine'
     ports:
       - '5432:5432'
     environment:
@@ -33,6 +12,30 @@ services:
       POSTGRES_DB: 'contract_db'
     volumes:
       - 'contract_db:/var/lib/postgresql/data:rw'
+    networks:
+      - biz_network
+
+  contract-grpc:
+    container_name: contract-grpc
+    restart: always
+    image: biz/contract-grpc:latest
+    build:
+      context: ./.docker/contract_grpc
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+    ports:
+      - '50051:50051'
+      - '4343:4317'
+    environment:
+      TZ: 'America/Sao_Paulo'
+      RUST_LOG: debug
+      DATABASE_URL: postgresql://username:password@contract-db:5432/contract_db
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
+    depends_on:
+      - contract-db
+      - kafka
+      - otel-collector
     networks:
       - biz_network
 
@@ -68,7 +71,7 @@ services:
   control-center:
     container_name: control-center
     restart: always
-    image: confluentinc/cp-enterprise-control-center:latest
+    image: confluentinc/cp-enterprise-control-center:latest.arm64
     hostname: control-center
     depends_on:
       - kafka
@@ -82,10 +85,123 @@ services:
     networks:
       - biz_network
 
+  otel-collector:
+    container_name: otel-collector
+    image: otel/opentelemetry-collector:latest
+    command:
+      [
+        "--config=/etc/otel_collector/otel_collector_config.yaml"
+      ]
+    volumes:
+      - ./.docker/otel_collector/otel_collector_config.yaml:/etc/otel_collector/otel_collector_config.yaml
+    ports:
+      - "4317:4317"
+    depends_on:
+      - elasticsearch
+    networks:
+      - biz_network
+
+  elasticsearch:
+    container_name: elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
+    restart: always
+    volumes:
+      - certs:/usr/share/elasticsearch/config/certs
+    user: "0"
+    command: >
+      bash -c '
+        if [ x${ELASTIC_PASSWORD} == x ]; then
+          echo "Set the ELASTIC_PASSWORD environment variable in the .env file";
+          exit 1;
+        elif [ x${KIBANA_PASSWORD} == x ]; then
+          echo "Set the KIBANA_PASSWORD environment variable in the .env file";
+          exit 1;
+        fi;
+        if [ ! -f config/certs/ca.zip ]; then
+          echo "Creating CA";
+          bin/elasticsearch-certutil ca --silent --pem -out config/certs/ca.zip;
+          unzip config/certs/ca.zip -d config/certs;
+        fi;
+        if [ ! -f config/certs/certs.zip ]; then
+          echo "Creating certs";
+          echo -ne \
+          "instances:\n"\
+          "  - name: es01\n"\
+          "    dns:\n"\
+          "      - es01\n"\
+          "      - localhost\n"\
+          "    ip:\n"\
+          "      - 127.0.0.1\n"\
+          "  - name: es02\n"\
+          "    dns:\n"\
+          "      - es02\n"\
+          "      - localhost\n"\
+          "    ip:\n"\
+          "      - 127.0.0.1\n"\
+          "  - name: es03\n"\
+          "    dns:\n"\
+          "      - es03\n"\
+          "      - localhost\n"\
+          "    ip:\n"\
+          "      - 127.0.0.1\n"\
+          > config/certs/instances.yml;
+          bin/elasticsearch-certutil cert --silent --pem -out config/certs/certs.zip --in config/certs/instances.yml --ca-cert config/certs/ca/ca.crt --ca-key config/certs/ca/ca.key;
+          unzip config/certs/certs.zip -d config/certs;
+        fi;
+        echo "Setting file permissions"
+        chown -R root:root config/certs;
+        find . -type d -exec chmod 750 \{\} \;;
+        find . -type f -exec chmod 640 \{\} \;;
+        echo "Waiting for Elasticsearch availability";
+        until curl -s --cacert config/certs/ca/ca.crt https://es01:9200 | grep -q "missing authentication credentials"; do sleep 30; done;
+        echo "Setting kibana_system password";
+        until curl -s -X POST --cacert config/certs/ca/ca.crt -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" https://es01:9200/_security/user/kibana_system/_password -d "{\"password\":\"${KIBANA_PASSWORD}\"}" | grep -q "^{}"; do sleep 10; done;
+        echo "All done!";
+      '
+    healthcheck:
+      test: [ "CMD-SHELL", "[ -f config/certs/es01/es01.crt ]" ]
+      interval: 1s
+      timeout: 5s
+      retries: 120
+
+  kibana:
+    container_name: kibana
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
+    volumes:
+      - certs:/usr/share/kibana/config/certs
+      - kibanadata:/usr/share/kibana/data
+    ports:
+      - ${KIBANA_PORT}:5601
+    environment:
+      - SERVERNAME=kibana
+      - ELASTICSEARCH_HOSTS=https://es01:9200
+      - ELASTICSEARCH_USERNAME=kibana_system
+      - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
+      - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
+    mem_limit: ${MEM_LIMIT}
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -s -I http://localhost:5601 | grep -q 'HTTP/1.1 302 Found'"
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+
 networks:
   biz_network:
     driver: bridge
 
 volumes:
   contract_db:
+    driver: local
+  certs:
+    driver: local
+  esdata01:
+    driver: local
+  kibanadata:
     driver: local
